@@ -1,5 +1,6 @@
 'use strict';
 const MARKETING_METRICS=[
+ ['bonus','Récompenses','Rewards','money'],
  ['ad','Publicité','Advertising','money'],['price','Prix par biscuit','Price per cookie','money'],
  ['baked','Biscuits préparés','Cookies baked','count'],['sold','Ventes réelles','Actual sales','count'],
  ['revenue','Recettes réelles','Actual revenue','money'],['baking','Coût de fabrication','Baking cost','money'],
@@ -24,9 +25,9 @@ function marketingTimeline(history){
   totalAd+=r.ad;totalRevenue+=r.revenue;totalProfit+=r.profit;
   // Older saves have actual results, but no record of the day's event.
   const known=Number.isInteger(r.event)&&Boolean(EVENTS[r.event]);
-  const f=known?forecastSales(r.baked,r.price,r.ad,r.event):null;
-  const base=known?forecastSales(r.baked,r.price,0,r.event):null;
-  return {...r,baking:r.baked*50,unsold:r.baked-r.sold,sellThrough:r.baked?r.sold/r.baked:null,margin:r.revenue?r.profit/r.revenue:null,breakEven:Math.ceil(r.expenses/r.price),
+  const f=known?forecastSales(r.baked,r.price,r.ad,r.event,r.boost||1):null;
+  const base=known?forecastSales(r.baked,r.price,0,r.event,r.boost||1):null;
+  return {...r,bonus:r.bonus||0,baking:r.baked*50,unsold:r.baked-r.sold,sellThrough:r.baked?r.sold/r.baked:null,margin:r.revenue?r.profit/r.revenue:null,breakEven:Math.ceil(r.expenses/r.price),
    forecastSold:f?.sold??null,forecastLow:f?.low??null,forecastHigh:f?.high??null,forecastRevenue:f?.revenue??null,forecastProfit:f?.profit??null,lowProfit:f?.lowProfit??null,highProfit:f?.highProfit??null,
    noAdSold:base?.sold??null,extraSales:f?f.sold-base.sold:null,extraRevenue:f?f.revenue-base.revenue:null,netGain:f?f.profit-base.profit:null,roi:f&&r.ad?(f.profit-base.profit)/r.ad:null,totalAd,totalRevenue,totalProfit};
  });

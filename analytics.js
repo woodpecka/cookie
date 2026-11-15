@@ -1,13 +1,13 @@
 'use strict';
 // The same demand model drives both the forecast and actual trading days.
-function customerDemand(price,ad,event,factor=1){
-  return Math.max(0,Math.round((42+18*Math.sqrt(ad/100))*Math.pow(200/price,1.45)*EVENTS[event].demand*factor));
+function customerDemand(price,ad,event,factor=1,boost=1){
+  return Math.max(0,Math.round((42+18*Math.sqrt(ad/100))*Math.pow(200/price,1.45)*EVENTS[event].demand*factor*boost));
 }
-function forecastSales(baked,price,ad,event){
+function forecastSales(baked,price,ad,event,boost=1){
   const expenses=baked*50+ad;
-  const sold=Math.min(baked,customerDemand(price,ad,event));
-  const low=Math.min(baked,customerDemand(price,ad,event,.85));
-  const high=Math.min(baked,customerDemand(price,ad,event,1.15));
+  const sold=Math.min(baked,customerDemand(price,ad,event,1,boost));
+  const low=Math.min(baked,customerDemand(price,ad,event,.85,boost));
+  const high=Math.min(baked,customerDemand(price,ad,event,1.15,boost));
   return {sold,low,high,revenue:sold*price,expenses,profit:sold*price-expenses,lowProfit:low*price-expenses,highProfit:high*price-expenses};
 }
 function renderAnalytics(){
@@ -23,14 +23,14 @@ function renderAnalytics(){
     target.innerHTML=`<p role="status">${t('Saisissez une quantité, un prix et un budget valides pour afficher les prévisions.','Enter a valid quantity, price and budget to see forecasts.')}</p>`;
     renderMarketingHistory();return;
   }
-  const f=forecastSales(baked,price,ad,state.event),base=forecastSales(baked,price,0,state.event);
+  const f=forecastSales(baked,price,ad,state.event,shopBoost()),base=forecastSales(baked,price,0,state.event,shopBoost());
   const extraSales=f.sold-base.sold,extraRevenue=f.revenue-base.revenue,netGain=f.profit-base.profit;
   const percent=n=>new Intl.NumberFormat(language==='fr'?'fr-CA':'en-US',{style:'percent',maximumFractionDigits:0}).format(n);
   let metricIndex=0;
   const metricKeys=['forecastSold','forecastRevenue','forecastProfit','breakEven','ad','extraSales','netGain','roi'];
   const metric=(label,value,note)=>`<div><span>${label}</span><strong>${value}</strong><small>${note}</small><button type="button" class="metric-chart-button" data-chart="${metricKeys[metricIndex++]}">${t('Graphique','Chart')}</button></div>`;
   const budgets=[...new Set([0,100,200,500,1000,2000,5000,Math.floor(ad/200)*100,ad,Math.min(10000000,ad*2)])].sort((a,b)=>a-b);
-  const scenarios=budgets.map(budget=>({budget,...forecastSales(baked,price,budget,state.event)}));
+  const scenarios=budgets.map(budget=>({budget,...forecastSales(baked,price,budget,state.event,shopBoost())}));
   const feasible=scenarios.filter(s=>s.expenses<=state.cash);
   const best=feasible.reduce((a,b)=>!a||b.profit>a.profit?b:a,null);
   const signed=n=>`${n>0?'+':''}${money(n)}`;
@@ -60,6 +60,7 @@ function renderAnalytics(){
     </tr></thead><tbody>${scenarios.map(s=>`<tr class="${s.budget===ad?'selected-scenario':''}"><td>${money(s.budget)}</td><td>${s.sold}</td><td>${money(s.revenue)}</td><td>${money(s.expenses)}</td><td class="${s.profit>=0?'positive':'negative'}">${money(s.profit)}</td><td>${signed(s.profit-base.profit)}</td><td>${s.expenses<=state.cash?t('Disponible','Available'):t('Insuffisant','Over budget')}</td></tr>`).join('')}</tbody></table></div>
     <p class="analysis-tip">${best?t('Meilleur bénéfice central parmi les scénarios abordables affichés :','Best central profit among the affordable scenarios shown:')+' '+money(best.budget)+' '+t('de publicité, pour un bénéfice de','in advertising, for a profit of')+' '+money(best.profit)+'.':t('Aucun scénario affiché n’est abordable avec cette quantité.','None of the shown scenarios is affordable with this batch size.')}</p>
     <p class="analysis-method">${t('Méthode : prévision centrale sans variation aléatoire; fourchette avec la variation de demande du jeu (−15 % à +15 %), arrondie et limitée par le stock. Ce sont des scénarios, pas une garantie ni une moyenne statistique. La publicité a un rendement décroissant.','Method: central forecast without random variation; range uses the game’s demand variation (−15% to +15%), rounded and capped by stock. These are scenarios, not a guarantee or a statistical mean. Advertising has diminishing returns.')}</p>`;
+  target.innerHTML+=`<p class="analysis-method">${t('Les prévisions incluent les améliorations installées. Les récompenses de défis et les achats d’améliorations sont exclus du bénéfice commercial prévu.','Forecasts include installed upgrades. Challenge rewards and upgrade purchases are excluded from forecast trading profit.')}</p>`;
   renderMarketingHistory();
 }
 function renderMarketingHistory(){

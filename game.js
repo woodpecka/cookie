@@ -9,8 +9,8 @@ const EVENTS = [
 const KEY='kevins-cookie-shop-v1';
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat(language==='fr'?'fr-CA':'en-US',{style:'currency',currency:'USD'}).format(n/100);
-function fresh(){return {cash:10000,history:[],event:0};}
-function readSave(){try {const s=JSON.parse(localStorage.getItem(KEY));if(s&&Number.isInteger(s.cash)&&s.cash>=0&&Array.isArray(s.history)&&s.history.length<=30&&Number.isInteger(s.event)&&EVENTS[s.event]&&s.history.every(r=>['day','baked','sold','price','ad','revenue','expenses','profit','cash'].every(k=>Number.isFinite(r[k]))))return s;}catch{}return fresh();}
+function fresh(){return {cash:10000,history:[],event:0,upgrades:[],achievements:[],investments:0};}
+function readSave(){try {const s=JSON.parse(localStorage.getItem(KEY));if(s&&Number.isInteger(s.cash)&&s.cash>=0&&Array.isArray(s.history)&&s.history.length<=30&&Number.isInteger(s.event)&&EVENTS[s.event]&&s.history.every(r=>['day','baked','sold','price','ad','revenue','expenses','profit','cash'].every(k=>Number.isFinite(r[k])))){s.upgrades=Array.isArray(s.upgrades)?[...new Set(s.upgrades.filter(id=>SHOP_UPGRADES.some(u=>u.id===id)))]:[];s.achievements=Array.isArray(s.achievements)?[...new Set(s.achievements.filter(id=>SHOP_MILESTONES.some(m=>m.id===id)))]:[];s.investments=Number.isInteger(s.investments)&&s.investments>=0?s.investments:0;return s;}}catch{}return fresh();}
 let state=readSave();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('save-status').textContent='Saving unavailable. Keep this tab open.';localize();}}
 function values(){return {baked:Number($('quantity').value),price:Math.round(Number($('price').value)*100),ad:Math.round(Number($('advertising').value)*100)};}
@@ -33,13 +33,13 @@ if(n){$('empty').hidden=true;$('report').hidden=false;const r=state.history[n-1]
 $('ledger').innerHTML=[...state.history].reverse().map(r=>`<tr><td>${String(r.day).padStart(2,'0')}</td><td>${r.baked} / ${r.sold}</td><td>${money(r.revenue)}</td><td>${money(r.expenses)}</td><td class="${r.profit>=0?'positive':'negative'}">${money(r.profit)}</td><td>${money(r.cash)}</td></tr>`).join('');
 }else{$('empty').hidden=false;$('report').hidden=true;$('results-title').textContent='The daily digest';$('ledger').innerHTML='<tr><td colspan="6" class="no-history">Your shop\'s story starts with day one.</td></tr>';}
 updateCost();}
-function render(){renderBase();localize();}
+function render(){renderProgression();renderBase();localize();}
 $('language').addEventListener('change',()=>{
   language=$('language').value==='en'?'en':'fr';
   try{localStorage.setItem('eric-cookie-language',language);}catch{}
   render();
 });
 $('day-form').addEventListener('input' ,updateCost);
-$('day-form').addEventListener('submit',e=>{e.preventDefault();if(finished()||!$('day-form').checkValidity())return;const {baked,price,ad}=values();const expenses=baked*50+ad;if(expenses>state.cash)return;const demand=customerDemand(price,ad,state.event,.85+Math.random()*.3);const sold=Math.min(baked,demand),revenue=sold*price,profit=revenue-expenses;state.cash+=profit;state.history.push({day:state.history.length+1,baked,sold,price,ad,revenue,expenses,profit,event:state.event,cash:state.cash});state.event=Math.floor(Math.random()*EVENTS.length);save();render();});
+$('day-form').addEventListener('submit',e=>{e.preventDefault();if(finished()||!$('day-form').checkValidity())return;const {baked,price,ad}=values();const expenses=baked*50+ad;if(expenses>state.cash)return;const demand=customerDemand(price,ad,state.event,.85+Math.random()*.3,shopBoost());const sold=Math.min(baked,demand),revenue=sold*price,profit=revenue-expenses;state.cash+=profit;state.history.push({day:state.history.length+1,baked,sold,price,ad,revenue,expenses,profit,event:state.event,boost:shopBoost(),cash:state.cash});awardShopRewards(state.history[state.history.length-1]);state.event=Math.floor(Math.random()*EVENTS.length);save();render();});
 $('restart').addEventListener('click',()=>$('restart-dialog').showModal());$('cancel-restart').addEventListener('click',()=>$('restart-dialog').close());$('confirm-restart').addEventListener('click',()=>{state=fresh();$('quantity').value=60;$('price').value=2;$('advertising').value=5;save();$('restart-dialog').close();render();});
 render();
