@@ -1,6 +1,8 @@
 'use strict';
 
 const translations = {
+  "Marketing & forecasts": "Marketing et prévisions",
+  "Explore advertising costs, sales and profit before opening.": "Explorez les coûts publicitaires, les ventes et le bénéfice avant d’ouvrir.",
   "Eric's Cookie Shop Tycoon": "La biscuiterie d’Eric",
   "ERIC'S": "ERIC",
   "COOKIE SHOP": "BISCUITERIE",

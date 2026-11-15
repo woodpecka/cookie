@@ -15,7 +15,7 @@ let state=readSave();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('save-status').textContent='Saving unavailable. Keep this tab open.';localize();}}
 function values(){return {baked:Number($('quantity').value),price:Math.round(Number($('price').value)*100),ad:Math.round(Number($('advertising').value)*100)};}
 function finished(){return state.history.length>=30||state.cash<50;}
-function updateCost(){const v=values(),cost=v.baked*50+v.ad;const valid=$('day-form').checkValidity()&&Number.isFinite(cost);$('cost').textContent=Number.isFinite(cost)?money(cost):'—';$('error').textContent=valid&&cost>state.cash?'That batch is over budget. Bake fewer cookies or lower your ad spend.':'';$('bake').disabled=finished()||!valid||cost>state.cash;localize();}
+function updateCost(){const v=values(),cost=v.baked*50+v.ad;const valid=$('day-form').checkValidity()&&Number.isFinite(cost);$('cost').textContent=Number.isFinite(cost)?money(cost):'—';$('error').textContent=valid&&cost>state.cash?'That batch is over budget. Bake fewer cookies or lower your ad spend.':'';$('bake').disabled=finished()||!valid||cost>state.cash;renderAnalytics();localize();}
 function renderCustomers(){
   const last=state.history[state.history.length-1];
   const sold=last?last.sold:0;
@@ -40,6 +40,6 @@ $('language').addEventListener('change',()=>{
   render();
 });
 $('day-form').addEventListener('input' ,updateCost);
-$('day-form').addEventListener('submit',e=>{e.preventDefault();if(finished()||!$('day-form').checkValidity())return;const {baked,price,ad}=values();const expenses=baked*50+ad;if(expenses>state.cash)return;const demand=Math.max(0,Math.round((42+18*Math.sqrt(ad/100))*Math.pow(200/price,1.45)*EVENTS[state.event].demand*(.85+Math.random()*.3)));const sold=Math.min(baked,demand),revenue=sold*price,profit=revenue-expenses;state.cash+=profit;state.history.push({day:state.history.length+1,baked,sold,price,ad,revenue,expenses,profit,cash:state.cash});state.event=Math.floor(Math.random()*EVENTS.length);save();render();});
+$('day-form').addEventListener('submit',e=>{e.preventDefault();if(finished()||!$('day-form').checkValidity())return;const {baked,price,ad}=values();const expenses=baked*50+ad;if(expenses>state.cash)return;const demand=customerDemand(price,ad,state.event,.85+Math.random()*.3);const sold=Math.min(baked,demand),revenue=sold*price,profit=revenue-expenses;state.cash+=profit;state.history.push({day:state.history.length+1,baked,sold,price,ad,revenue,expenses,profit,cash:state.cash});state.event=Math.floor(Math.random()*EVENTS.length);save();render();});
 $('restart').addEventListener('click',()=>$('restart-dialog').showModal());$('cancel-restart').addEventListener('click',()=>$('restart-dialog').close());$('confirm-restart').addEventListener('click',()=>{state=fresh();$('quantity').value=60;$('price').value=2;$('advertising').value=5;save();$('restart-dialog').close();render();});
 render();

@@ -17,3 +17,9 @@ La progression est sauvegardée dans le navigateur si le stockage est disponible
 Open `index.html` in a modern browser, or run `python3 -m http.server 8000` and visit http://localhost:8000. Choose **English** in the language selector; your choice is saved when browser storage is available.
 
 Start with $100 and manage Eric’s cookie shop for 30 days. Each cookie costs $0.50 to bake. Set quantity, price and advertising, then open for the day. Expenses are paid upfront; unsold cookies expire. The game ends after day 30 or when you cannot afford another cookie. Progress saves automatically in the browser. Starting a new game asks for confirmation.
+
+## Marketing et prévisions / Marketing and forecasts
+
+Le panneau marketing se met à jour avec la quantité, le prix et le budget publicitaire. Il affiche les ventes, les recettes, le bénéfice, le seuil de rentabilité et une fourchette liée à la variation aléatoire du jeu. Comparez plusieurs budgets, leur coût et le gain net prévu par rapport à une journée sans publicité. Le meilleur scénario indiqué est limité aux budgets affichés et abordables. Les totaux réels apparaissent après chaque journée; ils ne prouvent pas un effet causal de la publicité.
+
+The marketing panel updates with quantity, price and advertising budget. It shows sales, revenue, profit, break-even sales and a range based on the game's random demand variation. Compare advertising budgets and their incremental net profit versus no advertising. The highlighted best option is limited to the displayed affordable scenarios. Actual historical totals do not isolate advertising's causal effect.
