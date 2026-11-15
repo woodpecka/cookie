@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kevin's Cookie Shop Tycoon</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<header><a class="brand" href="./"><span class="brand-icon">🍪</span><span>KEVIN'S <b>COOKIE SHOP</b></span></a><button class="subtle" id="restart">↻ New game</button></header>
+<main>
+<section class="intro"><div><div class="eyebrow">SMALL BATCHES. BIG DREAMS.</div><h1>A little dough.<br>A lot of possibility.</h1><p>You, a cookie shop, and 30 days to make it sweet.</p></div><div class="shop-art" aria-hidden="true"><div class="spark s1">✦</div><div class="spark s2">✧</div><div class="shop-sign">KEVIN'S</div><div class="awning"><i></i><i></i><i></i><i></i><i></i></div><div class="shop-body"><div class="window">🍪<span>FRESHLY BAKED</span></div><div class="door"><span>OPEN</span><b>•</b></div></div><div class="shop-base"></div><div class="plant">🌿</div></div></section>
+<section class="stats" aria-label="Shop overview"><div><span>CASH REGISTER</span><strong id="cash">$100.00</strong><small>Make every dollar count</small></div><div><span>YOUR JOURNEY</span><strong id="day">Day 1 <em>/ 30</em></strong><div class="progress"><i id="progress"></i></div></div><div><span>TOTAL PROFIT</span><strong id="total-profit">$0.00</strong><small>Since opening day</small></div><div><span>COOKIES SOLD</span><strong id="total-sold">0</strong><small>Little moments of happiness</small></div></section>
+<div class="workspace"><section class="card plan"><div class="section-title"><span class="badge">01</span><div><h2 id="plan-title">Let's open the shop</h2><p>Your recipe for a successful day.</p></div></div>
+<div class="forecast"><span id="event-icon">☀️</span><div><b id="event-title"></b><p id="event-description"></p></div></div>
+<form id="day-form"><label for="quantity">Cookies to bake <span>$0.50 each</span></label><div class="input-wrap"><span>🍪</span><input id="quantity" type="number" min="0" max="10000" step="1" value="60" required><span>cookies</span></div>
+<label for="price">Price per cookie <span>Sweet spot: around $2</span></label><div class="input-wrap"><span>$</span><input id="price" type="number" min="0.25" max="20" step="0.25" value="2" required><span>/ cookie</span></div>
+<label for="advertising">Advertising budget <span>Bring in more cookie lovers</span></label><div class="input-wrap"><span>$</span><input id="advertising" type="number" min="0" max="100000" step="1" value="5" required><span>/ day</span></div>
+<div class="cost-line"><span>Today's upfront cost</span><b id="cost">$35.00</b></div><p class="error" id="error" role="alert"></p><button class="primary" id="bake" type="submit">Bake & open for day 1 <span>→</span></button></form><p class="fineprint">Fresh every day. Unsold cookies don't carry over.</p></section>
+<section class="card results" aria-live="polite"><div class="section-title"><span class="badge">02</span><div><h2 id="results-title">The daily digest</h2><p>A fresh look at your shop's performance.</p></div></div><div id="empty" class="empty"><div class="plate">🍪</div><h3>Your first batch awaits.</h3><p>Set your recipe for the day, open the doors,<br>and see how the cookie crumbles.</p><span>BAKED WITH A LITTLE AMBITION</span></div><div id="report" hidden></div></section></div>
+<section class="card history"><div class="history-heading"><div><h2>From the cookie ledger</h2><p>Every batch is part of the story.</p></div><span id="history-count">0 days in the books</span></div><div class="table-scroll"><table><thead><tr><th>DAY</th><th>BAKED / SOLD</th><th>REVENUE</th><th>EXPENSES</th><th>PROFIT</th><th>CASH</th></tr></thead><tbody id="ledger"><tr><td colspan="6" class="no-history">Your shop's story starts with day one.</td></tr></tbody></table></div></section>
+<footer><span>🍪 Kevin's Cookie Shop Tycoon</span><span>30 days. One sweet adventure. <span id="save-status">Progress saved on this browser.</span></span></footer>
+</main></div><dialog id="restart-dialog"><h2>A fresh start?</h2><p>This will reset your shop to day 1 with $100.</p><div><button class="subtle" id="cancel-restart">Keep playing</button><button class="primary" id="confirm-restart">Start over</button></div></dialog><script src="game.js"></script>
+</body></html>
