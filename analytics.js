@@ -26,7 +26,9 @@ function renderAnalytics(){
   const f=forecastSales(baked,price,ad,state.event),base=forecastSales(baked,price,0,state.event);
   const extraSales=f.sold-base.sold,extraRevenue=f.revenue-base.revenue,netGain=f.profit-base.profit;
   const percent=n=>new Intl.NumberFormat(language==='fr'?'fr-CA':'en-US',{style:'percent',maximumFractionDigits:0}).format(n);
-  const metric=(label,value,note)=>`<div><span>${label}</span><strong>${value}</strong><small>${note}</small></div>`;
+  let metricIndex=0;
+  const metricKeys=['forecastSold','forecastRevenue','forecastProfit','breakEven','ad','extraSales','netGain','roi'];
+  const metric=(label,value,note)=>`<div><span>${label}</span><strong>${value}</strong><small>${note}</small><button type="button" class="metric-chart-button" data-chart="${metricKeys[metricIndex++]}">${t('Graphique','Chart')}</button></div>`;
   const budgets=[...new Set([0,100,200,500,1000,2000,5000,Math.floor(ad/200)*100,ad,Math.min(10000000,ad*2)])].sort((a,b)=>a-b);
   const scenarios=budgets.map(budget=>({budget,...forecastSales(baked,price,budget,state.event)}));
   const feasible=scenarios.filter(s=>s.expenses<=state.cash);
@@ -61,6 +63,7 @@ function renderAnalytics(){
   renderMarketingHistory();
 }
 function renderMarketingHistory(){
+  renderMarketingCharts();
   const t=(fr,en)=>language==='fr'?fr:en;
   const h=state.history;
   $('marketing-history').innerHTML=h.length?`<h3>${t('Résultats réels depuis l’ouverture','Actual results since opening')}</h3><div class="analysis-metrics">
