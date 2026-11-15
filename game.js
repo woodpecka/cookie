@@ -10,7 +10,7 @@ const KEY='kevins-cookie-shop-v1';
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
 function fresh(){return {cash:10000,history:[],event:0};}
-function readSave(){try {const s=JSON.parse(localStorage.getItem(KEY));if(s&&Number.isInteger(s.cash)&&s.cash>=0&&Array.isArray(s.history)&&s.history.length<=30&&Number.isInteger(s.event)&&EVENTS[s.event]&&s.history.every(r=>['day','baked','sold','revenue','expenses','profit','cash'].every(k=>Number.isFinite(r[k]))))return s;}catch{}return fresh();}
+function readSave(){try {const s=JSON.parse(localStorage.getItem(KEY));if(s&&Number.isInteger(s.cash)&&s.cash>=0&&Array.isArray(s.history)&&s.history.length<=30&&Number.isInteger(s.event)&&EVENTS[s.event]&&s.history.every(r=>['day','baked','sold','price','ad','revenue','expenses','profit','cash'].every(k=>Number.isFinite(r[k]))))return s;}catch{}return fresh();}
 let state=readSave();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('save-status').textContent='Saving unavailable. Keep this tab open.';}}
 function values(){return {baked:Number($('quantity').value),price:Math.round(Number($('price').value)*100),ad:Math.round(Number($('advertising').value)*100)};}
@@ -20,8 +20,8 @@ function renderCustomers(){
   const last=state.history[state.history.length-1];
   const sold=last?last.sold:0;
   // Keep the street readable even when a very large batch sells out.
-  const perPerson=Math.max(10,Math.ceil(sold/200)*10);
-  const count=Math.ceil(sold/perPerson);
+  const count=Math.min(20,Math.ceil(sold/10));
+  const perPerson=count?Math.ceil(sold/count):10;
   $('customer-count').textContent=last?`${sold.toLocaleString()} customers · Day ${last.day}`:'Waiting for opening day';
   $('customer-empty').hidden=sold>0;
   $('customer-empty').textContent=last?'A quiet day. Try a new price or a little advertising.':'Your first customers are just a batch away.';
